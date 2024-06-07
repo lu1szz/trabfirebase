@@ -1,61 +1,45 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
 import { bancoExterno } from './firebaseConnection';
-import { useEffect, useState } from 'react';
-import { doc, getDoc, onSnapshot, setDoc, addDoc, collection } from 'firebase/firestore';
-
+import { useState } from 'react';
+import { doc, setDoc, addDoc, collection } from 'firebase/firestore';
 
 export default function App() {
 
-  const [nome, setNome] = useState('Carregando...');
-  const [nome2, setNome2] = useState('');
-
-  useEffect(() => {
-    async function pegarDados() {
-      const referencia = doc(bancoExterno, "receitas", "1")
-
-      getDoc(referencia)
-        .then((snap) => {
-          setNome(snap.data()?.Prato1)
-
-        })
-
-        .catch((erro) => {
-          console.log(erro)
-        })
-    }
-    pegarDados();
-    onSnapshot(doc(bancoExterno,"receitas", "2"), (snap)=>{
-      setNome2(snap.data()?.Prato2)
-    })
-  }, [])
-
+  const [comida1, setComida1] = useState('');
+  const [comida2, setComida2] = useState('');
+  const [comida3, setComida3] = useState('');
 
   async function addBancoExterno() {
     await setDoc(doc(bancoExterno, "receitas", "3"), {
-      Prato1: "Churrasco",
-      Prato2: "Coxinha",
-      Prato3: "Esfirra"
+      Prato1: comida1,
+      Prato2: comida2,
+      Prato3: comida3
     })
   }
-
-  async function addBancoExterno2() {
-    await addDoc(collection(bancoExterno, "receitas"), {
-      Prato1: "Pastel",
-      Prato2: "Tapioca",
-      Prato3: "Empada"
-    })
-  }
-
 
   return (
     <View style={styles.container}>
-      <Text style={{fontSize:25}}>Informação:{nome}, {nome2}</Text>
-      <TouchableOpacity style={{ backgroundColor:"#F50" }} onPress={addBancoExterno}>
-        <Text style={{ fontSize: 20, paddingHorizontal:15 }}>Adicionar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={{ backgroundColor: "#AFF" }} onPress={addBancoExterno2}>
-        <Text style={{ fontSize: 20, paddingHorizontal: 15 }}>Adicionar</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Comida 1"
+        value={comida1}
+        onChangeText={setComida1}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Comida 2"
+        value={comida2}
+        onChangeText={setComida2}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Comida 3"
+        value={comida3}
+        onChangeText={setComida3}
+      />
+      <TouchableOpacity style={styles.button} onPress={addBancoExterno}>
+        <Text style={styles.buttonText}>Adicionar</Text>
       </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
@@ -68,5 +52,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  input: {
+    width: 200,
+    height: 40,
+    borderColor: '#000',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: "#F50",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 20,
+    color: '#fff',
   },
 });
